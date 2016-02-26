@@ -5,6 +5,7 @@ require 'active_support/inflector'
 # of this project. It was only a warm up.
 
 class SQLObject
+
   def self.columns
     @column ||= DBConnection.execute2(<<-SQL).first.map(&:to_sym)
       SELECT *
