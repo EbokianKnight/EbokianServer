@@ -3,12 +3,15 @@ require 'sqlite3'
 PRINT_QUERIES = ENV['PRINT_QUERIES'] == 'true'
 # https://tomafro.net/2010/01/tip-relative-paths-with-file-expand-path
 ROOT_FOLDER = File.join(File.dirname(__FILE__), '..')
-CATS_SQL_FILE = File.join(ROOT_FOLDER, 'cats.sql') # << << redirect to new database
-CATS_DB_FILE = File.join(ROOT_FOLDER, 'cats.db') # << redirect to new database
+
+## Point this to a sql schema file
+DATABASE_SQL_FILE = File.join(ROOT_FOLDER, 'cats.sql')
+## Point this to sql database
+DATABASE_FILE_NAME = File.join(ROOT_FOLDER, 'cats.db')
 
 class DBConnection
   def self.open(db_file_name)
-    @db = SQLite3::Database.new(db_file_name) # << ???
+    @db = SQLite3::Database.new(db_file_name)
     @db.results_as_hash = true
     @db.type_translation = true
 
@@ -17,12 +20,12 @@ class DBConnection
 
   def self.reset
     commands = [
-      "rm '#{CATS_DB_FILE}'", #<< match above
-      "cat '#{CATS_SQL_FILE}' | sqlite3 '#{CATS_DB_FILE}'" #<< match above
+      "rm '#{DATABASE_FILE_NAME}'",
+      "cat '#{DATABASE_SQL_FILE}' | sqlite3 '#{DATABASE_FILE_NAME}'"
     ] #<< "cat ' is a command, not referencing ":cats"
 
     commands.each { |command| `#{command}` }
-    DBConnection.open(CATS_DB_FILE) #<< match above
+    DBConnection.open(DATABASE_FILE_NAME)
   end
 
   def self.instance

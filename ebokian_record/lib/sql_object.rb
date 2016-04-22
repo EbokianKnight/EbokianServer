@@ -4,7 +4,7 @@ require 'active_support/inflector'
 class SQLObject
 
   # Instanciates a new SQL Object
-  # calls self.attr_name = value on each param
+  # calls self.the_attr_name = value on each param
   def initialize(params = {})
     params.each do |attr_name, value|
       unless self.class.columns.include? attr_name.to_sym
