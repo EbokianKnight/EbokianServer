@@ -3,8 +3,9 @@ require 'active_support/inflector'
 
 class SQLObject
 
+  public
   # Instanciates a new SQL Object
-  # calls self.the_attr_name = value on each param
+  # calls self."#{the_attr_name}" = value on each param
   def initialize(params = {})
     params.each do |attr_name, value|
       unless self.class.columns.include? attr_name.to_sym
@@ -32,6 +33,7 @@ class SQLObject
   end
 
   # Dynamically create setter/getter methods for columns attributes
+  # Use to instantiate the columns of a newly minted Model
   def self.finalize!
     columns.each do |column|
       define_method(column) do
@@ -44,31 +46,25 @@ class SQLObject
     end
   end
 
-  # Query the table for a specific entry
+  # Query the table for a specific entry ID
   def self.find(id)
     results = DBConnection.execute(<<-SQL, id)
-    SELECT *
-    FROM #{table_name}
-    WHERE id = ?
-    LIMIT 1
+      SELECT *
+      FROM #{table_name}
+      WHERE id = ?
+      LIMIT 1
     SQL
-    parse_all(results).pop
+    parse_all(results)[0]
   end
 
-  # Invokes a query element returns a ruby array of SQL objects
-  def self.parse_all(results)
-    results.map { |result| self.new(result) }
-  end
-
-  # Table name setter
-  def self.table_name=(table_name)
-    @table_name = table_name
+  # Query the table for a specific entry value
+  def self.find_by(keyvalue = {})
+    return self.where(keyvalue)
   end
 
   # Table name getter
   def self.table_name
-    name = self.to_s.tableize
-    @table_name ||= name
+    @table_name ||= self.to_s.tableize
   end
 
   # returns or creates the attributes hash
@@ -79,6 +75,21 @@ class SQLObject
   # returns an array of the attribute values
   def attribute_values
     attributes.values
+  end
+
+  # returns an array of the attribute keys
+  def attribute_keys
+    attributes.keys
+  end
+
+  # removes record from the database
+  def destroy
+    return false unless self.id
+    DBConnection.execute(<<-SQL)
+      DELETE FROM #{table_name} WHERE id = #{self.id}
+    SQL
+
+    true
   end
 
   # adds an SQL object into the database, returns the new id
@@ -103,4 +114,17 @@ class SQLObject
       WHERE id = #{self.id}
     SQL
   end
+
+  private
+
+  # Invokes a query element returns a ruby array of SQL objects
+  def self.parse_all(results)
+    results.map { |result| self.new(result) }
+  end
+
+  # Table name setter
+  def self.table_name=(table_name)
+    @table_name = table_name
+  end
+
 end
