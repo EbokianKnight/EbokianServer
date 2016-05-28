@@ -23,6 +23,13 @@ class User < SQLObject
   ...
 end
 ```
+The traditional RESTful method calls are all complete and listed here:
+**Index**: User.all
+**Show**: User.find(:id)
+**Create**: User.new(:col => value).save
+**Update**: User.find(:id).save
+**Delete**: User.find(:id).destroy
+
 ####The Model will now have access to the following singleton methods:
 **User.attributes**
 ```
@@ -32,7 +39,7 @@ User.attributes #=> returns a Hash of keyed to the table column storing its valu
 ```
 User.all #=> returns rows in the users table as User objects
 ```
-**User.find(id)**
+**User.find(:id)**
 ```
 User.find(2) #=> returns the row in the users table with an id of 2
 ```
@@ -58,7 +65,7 @@ User.where(...) #=> functions like find_by
 ```
 
 
-####Instances of the Model will now have access to these basic RESTful methods:
+####Instances of the Model will now have access to these basic methods:
 user_instance.**save**<br/><br/>
 If you instantiate a new User, then set the fname and lname attributes of your
 user table and call save, it will INSERT the new row into the database and then
