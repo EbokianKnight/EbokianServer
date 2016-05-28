@@ -18,6 +18,8 @@ corresponding table name within your schema. users table matches User model.
 Your model must then inherit from SQLObject, and invoke finalize! to register
 the tables columns as attributes.
 ```
+require 'sql_object'
+
 class User < SQLObject
   User.finalize!
   ...
@@ -64,9 +66,44 @@ This still needs to be setup as chainable, until then it works like find_by
 User.where(...) #=> functions like find_by
 ```
 
+####associations
+These work by establishing a connection between various models through singleton
+methods that are run as the class loads. These create instance methods for the
+class that allow them to preform simple SQL join queries quickly and easily.
+<br/>
+**has_many**<br/>
+bob.teaches will return the class that bob teaches if any.
+bob.enrollments.map(&:class) will return a list of the Class objects that
+belong to the bob instance. This will be optimized to bob.classes when I add
+the function has_many_through.
+```
+class User < SQLObject
+  User.finalize!
+  has_many :enrollments
+  belongs_to :teaches, class_name: "Class", foreign_key: "teacher_id"
+end
+```
+**belongs_to**<br/>
+alegbra.teacher will return the teacher user object that belongs to that class
+alegbra.enrollments.map(&:students) will return a list of students who are in
+this class.
+```
+class Enrollment < SQLObject
+  Enrollment.finalize!
+
+  belongs_to :user
+  belongs_to :class
+end
+
+class Class < SQLObject
+  Class.finalize!
+  belongs_to :teacher, class_name: "User", foreign_key: "teacher_id"
+  has_many :students, class_name: "Enrollment", "student_id"
+end
+```
 
 ####Instances of the Model will now have access to these basic methods:
-user_instance.**save**<br/><br/>
+**user_instance.save**<br/><br/>
 If you instantiate a new User, then set the fname and lname attributes of your
 user table and call save, it will INSERT the new row into the database and then
 automatically assign it an ID.
@@ -86,7 +123,7 @@ bob.save
 ```
 You can also call `User.insert` or `User.update`.
 <br/><br/>
-user_instance.**destroy**
+**user_instance.destroy**
 ```
 bob = User.find_by(fname: "Bob")
 bob.destroy
@@ -94,6 +131,7 @@ bob.destroy
 
 ##**ToDo List**
 * [ ] Add and test HasManyThrough
+* [ ] Make the #where method within the searchable module chainable
 * [ ] Add file from which to read and change database constants
 * [ ] Build small sample site to showcase the code in action
 * [ ] Add database validations and !bang versions of save and destroy

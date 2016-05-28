@@ -1,6 +1,6 @@
 require_relative 'searchable'
 require 'active_support/inflector'
-  
+
 
 class AssocOptions < SQLObject
   attr_accessor :foreign_key, :class_name, :primary_key
