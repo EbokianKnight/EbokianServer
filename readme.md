@@ -9,57 +9,40 @@ Built through Test Driven Development, this is an MVC framework to handle databa
 * Constructed a Router switchboard parse html queries and direct them to the correct controller
 * Implemented persistent data storage by creating session cookies
 
-###Code Snippets
+###Deploy Server
 
-When initializing a new instance of an SQL object the SQL database response is collected and passed into the method as a hash. The hash is then iterated over and if the params are valid, it invokes the the method, stores the key in an attributes hash and assigns the value to the object.
+
+###ORM toolset
+When you name your model, it must be named as the singular case of the
+corresponding table name within your schema. users table matches User model.
+Your model must then inherit from SQLObject, and invoke finalize! to register
+the tables columns as attributes.
 ```
-# Dynamically create setter/getter methods for columns attributes
-def self.finalize!
-  columns.each do |column|
-    define_method(column) do
-      attributes[column]
-    end
-
-    define_method("#{column}=") do |value|
-      attributes[column] = value
-    end
-  end
+class User < SQLObject
+  User.finalize!
+  ...
 end
 ```
-Here is an example using the SQL to Ruby ORM tools. The database is called through DBConnection, the SQL query runs, and the results are parsed into an array with each object invoking its own model object.
+The Model will now have access to the following methods:
+* *::all*<br />
+`User.all #=> returns rows in the users table as User objects`
+* *::find(id)*<br />
+`User.find(2) #=> returns the row in the users table with an id of 2`
+* *::find_by(col: value)*<br />
 ```
-# Query the table and collect all entries
-def self.all
-  results = DBConnection.execute(<<-SQL)
-  SELECT *
-  FROM #{table_name}
-  SQL
-  parse_all(results)
-end
-
-# Invokes a query element returns a ruby array of SQL objects
-def self.parse_all(results)
-  results.map { |result| self.new(result) }
-end
+User.find_by(fname: "Bob") #=> returns user objects whose fname = "Bob"
+User.find_by(fname: "Bob", lname: "Smith") #=> returns users who meet both conditions
 ```
-One of the more complicated methods implemented are the associations. Here, when belongs_to is called it first creates another storage object that sets any missing parameters to default values, and stores the response into a hash to invoke in has_one_through calls.
-
-The code then dynamically builds the method using the method's declared name, the two keys required to make the joins table SQL invocation, and the klass of the modal to which this object is joining to. Finally the SQL query is invoked and the parsed SQL object is return from this method.
-```
-def belongs_to(name, options = {})
-  options = BelongsToOptions.new(name, options)
-  self.assoc_options[name] = options
-
-  define_method(name) do
-    klass = options.send :model_class
-    f_key = options.send :foreign_key
-    p_key = options.send :primary_key
-    object = klass.where(p_key => send(f_key)).first
-  end
-end
-```
+* *::table_name*<br />
+`User.table_name #=> returns the name of the users table`
+* *::columns*<br />
+`User.columns #=> returns the headers of each column of the users table`
+* *::where*<br />
+This still needs to be setup as chainable, until then it works like find_by
+`User.where(...) #=> functions like find_by`
 
 ##**ToDo List**
 * [ ] Add and test HasManyThrough
 * [ ] Add file from which to read and change database constants
-* [ ] Build small sample site to showcase the code in action 
+* [ ] Build small sample site to showcase the code in action
+* [ ] Add database validations and !bang versions of save and destroy
