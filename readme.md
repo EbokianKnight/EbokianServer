@@ -23,23 +23,50 @@ class User < SQLObject
   ...
 end
 ```
-The Model will now have access to the following methods:
-* *::all*<br />
+The Model will now have access to the following singleton methods:<br /><br />
+*all*<br />
 `User.all #=> returns rows in the users table as User objects`
-* *::find(id)*<br />
+*find(id)*<br />
 `User.find(2) #=> returns the row in the users table with an id of 2`
-* *::find_by(col: value)*<br />
+*find_by(col: value)*<br />
 ```
 User.find_by(fname: "Bob") #=> returns user objects whose fname = "Bob"
 User.find_by(fname: "Bob", lname: "Smith") #=> returns users who meet both conditions
 ```
-* *::table_name*<br />
+*table_name*<br />
 `User.table_name #=> returns the name of the users table`
-* *::columns*<br />
+*columns*<br />
 `User.columns #=> returns the headers of each column of the users table`
-* *::where*<br />
+*where*<br />
 This still needs to be setup as chainable, until then it works like find_by
 `User.where(...) #=> functions like find_by`
+<br /><br />
+
+Instances of the Model will now have access to these basic RESTful methods<br /><br />
+*save* <br />
+If you instantiate a new User, then set the fname and lname attributes of your
+user table and call save, it will INSERT the new row into the database and then
+automatically assign it an ID.
+```
+bob = User.new
+bob.fname = "Bob"
+bob.lname = "Smith"
+bob.save
+```
+If Bob was already in the database, then calling bob from the database, modify
+the objects attributes and calling save will UPDATE those changes into the
+corresponding rows within the database
+```
+bob = User.find_by(fname: "Bob")
+bob.lname = "Greenway"
+bob.save
+```
+You can also call `User.insert` or `User.update`.
+*destroy* <br />
+```
+bob = User.find_by(fname: "Bob")
+bob.destroy
+```
 
 ##**ToDo List**
 * [ ] Add and test HasManyThrough
