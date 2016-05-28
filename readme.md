@@ -24,11 +24,11 @@ class User < SQLObject
 end
 ```
 The traditional RESTful method calls are all complete and listed here:
-**Index**: User.all
-**Show**: User.find(:id)
-**Create**: User.new(:col => value).save
-**Update**: User.find(:id).save
-**Delete**: User.find(:id).destroy
+* **Index**: User.all
+* **Show**: User.find(:id)
+* **Create**: User.new(:col => value).save
+* **Update**: User.find(:id).save
+* **Delete**: User.find(:id).destroy
 
 ####The Model will now have access to the following singleton methods:
 **User.attributes**
