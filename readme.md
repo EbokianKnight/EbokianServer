@@ -26,17 +26,22 @@ end
 ####The Model will now have access to the following singleton methods:
 **all**<br/>
 `User.all #=> returns rows in the users table as User objects`
+<br/>
 **find(id)**<br/>
 `User.find(2) #=> returns the row in the users table with an id of 2`
+<br/>
 **find_by(col: value)**<br/>
 ```
 User.find_by(fname: "Bob") #=> returns user objects whose fname = "Bob"
 User.find_by(fname: "Bob", lname: "Smith") #=> returns users who meet both conditions
 ```
+<br/>
 **table_name**<br/>
 `User.table_name #=> returns the name of the users table`
+<br/>
 **columns**<br/>
 `User.columns #=> returns the headers of each column of the users table`
+<br/>
 **where**<br/>
 This still needs to be setup as chainable, until then it works like find_by
 `User.where(...) #=> functions like find_by`
@@ -62,6 +67,7 @@ bob.lname = "Greenway"
 bob.save
 ```
 You can also call `User.insert` or `User.update`.
+<br/>
 **destroy**<br/>
 ```
 bob = User.find_by(fname: "Bob")
