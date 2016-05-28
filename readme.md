@@ -24,31 +24,38 @@ class User < SQLObject
 end
 ```
 ####The Model will now have access to the following singleton methods:
-**all**<br/>
-`User.all #=> returns rows in the users table as User objects`
-<br/>
-**find(id)**<br/>
-`User.find(2) #=> returns the row in the users table with an id of 2`
-<br/>
-**find_by(col: value)**<br/>
+**User.all**
+```
+User.all #=> returns rows in the users table as User objects
+```
+**User.find(id)**
+```
+User.find(2) #=> returns the row in the users table with an id of 2
+```
+**User.find_by(col: value)**
 ```
 User.find_by(fname: "Bob") #=> returns user objects whose fname = "Bob"
 User.find_by(fname: "Bob", lname: "Smith") #=> returns users who meet both conditions
 ```
-<br/>
-**table_name**<br/>
-`User.table_name #=> returns the name of the users table`
-<br/>
-**columns**<br/>
-`User.columns #=> returns the headers of each column of the users table`
-<br/>
-**where**<br/>
+**User.table_name**
+```
+User.table_name #=> returns the name of the users table
+```
+
+**User.columns**
+```
+User.columns #=> returns the headers of each column of the users table
+```
+
+**User.where**</br>
 This still needs to be setup as chainable, until then it works like find_by
-`User.where(...) #=> functions like find_by`
+```
+User.where(...) #=> functions like find_by
+```
 
 
 ####Instances of the Model will now have access to these basic RESTful methods:
-**save**<br/>
+user_instance.**save**<br/>
 If you instantiate a new User, then set the fname and lname attributes of your
 user table and call save, it will INSERT the new row into the database and then
 automatically assign it an ID.
@@ -68,7 +75,7 @@ bob.save
 ```
 You can also call `User.insert` or `User.update`.
 <br/>
-**destroy**<br/>
+user_instance.**destroy**
 ```
 bob = User.find_by(fname: "Bob")
 bob.destroy
